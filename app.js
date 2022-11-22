@@ -8,16 +8,22 @@ require("dotenv").config({
 const GlobalError = require("./error/GlobalError");
 const errorHandler = require("./error/errorHandler");
 
+//!Routers:
+const userRouter = require("./routes/userRouter");
+
 //! my app
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-//! Environment
+//! using morgan at development mode
 if (process.env.NODE_ENV.trim() == "development") {
     app.use(morgan("dev"));
 };
+
+//! routers
+app.use("/api/v1/user", userRouter);
 
 //! throwing error when route does not exist
 app.use((req, res, next) => {
