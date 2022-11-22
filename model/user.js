@@ -25,10 +25,16 @@ const userSchema = mongoose.Schema({
     imgId: String, //! deleting image from cloudinary when deleting user
 });
 
+//! hasing password before saving user to the db
 userSchema.pre("save", async function (next) {
     this.password = await bcrypt.hash(this.password, 12);
     next();
 });
+
+//! checking if password correct
+userSchema.methods.checkPassword = async function (enteredPassword) {
+    return await bcrypt.compare(enteredPassword, this.password);
+};
 
 const User = mongoose.model("user", userSchema);
 module.exports = User;
