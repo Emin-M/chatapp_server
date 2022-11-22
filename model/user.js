@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 
 const userSchema = mongoose.Schema({
     username: {
@@ -23,6 +24,10 @@ const userSchema = mongoose.Schema({
     photo: String,
 
     imgId: String, //! deleting image from cloudinary when deleting user
+
+    resetToken: String,
+
+    tokenValidationTime: Date
 });
 
 //! hasing password before saving user to the db
@@ -34,6 +39,21 @@ userSchema.pre("save", async function (next) {
 //! checking if password correct
 userSchema.methods.checkPassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
+};
+
+//! hashing before sending
+userSchema.methods.hashResetPassword = async function () {
+    const resetPassword = crypto.randomBytes(12).toString("hex");
+
+    const hashedPassword = crypto
+        .createHash("md5")
+        .update(resetPassword)
+        .digest("hex");
+
+    this.resetToken = hashedPassword;
+    this.tokenValidationTime = Date.now() + 15 * 60 * 1000;
+
+    return resetPassword;
 };
 
 const User = mongoose.model("user", userSchema);

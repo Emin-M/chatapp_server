@@ -27,7 +27,9 @@
     "mongoose": "^6.7.2",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.20",
+    "pug": "^3.0.2",
     "run-script-os": "^1.1.6",
+    "sib-api-v3-sdk": "^8.4.2",
     "validator": "^13.7.0"
   }
 }
