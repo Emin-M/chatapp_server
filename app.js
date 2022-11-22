@@ -5,6 +5,8 @@ const morgan = require("morgan");
 require("dotenv").config({
     path: "./config.env"
 });
+const GlobalError = require("./error/GlobalError");
+const errorHandler = require("./error/errorHandler");
 
 //! my app
 const app = express();
@@ -16,6 +18,14 @@ app.use(express.json());
 if (process.env.NODE_ENV.trim() == "development") {
     app.use(morgan("dev"));
 };
+
+//! throwing error when route does not exist
+app.use((req, res, next) => {
+    next(new GlobalError(`${req.originalUrl} does not exist!`, 500));
+});
+
+//! Global Error Handler
+app.use(errorHandler);
 
 const DB = process.env.DB_STRING.replace("<password>", process.env.DB_PASSWORD);
 mongoose.connect(DB, (err) => {
