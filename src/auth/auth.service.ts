@@ -4,8 +4,10 @@ import * as argon from 'argon2';
 import { ConfigService } from '@nestjs/config/dist';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { SignInDto, SignUpDto } from './dto';
+import { ForgetPwDto, SignInDto, SignUpDto } from './dto';
 import { Prisma } from '@prisma/client';
+import { createHash, randomBytes } from 'crypto';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +15,7 @@ export class AuthService {
     private prisma: PrismaService,
     private config: ConfigService,
     private jwt: JwtService,
+    private readonly mailservice: MailService,
   ) {}
 
   //! signup
@@ -29,6 +32,9 @@ export class AuthService {
           userName: dto.userName,
         },
       });
+
+      //^ send welcome email
+      await this.mailservice.sendWelcomeMail(user.email, dto.userName);
 
       //^ login the user
       return this.generateToken(user.id);
@@ -61,6 +67,45 @@ export class AuthService {
 
       //^ login the user
       return this.generateToken(user.id);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  //! forgetPassword
+  async forgetPassword(dto: ForgetPwDto) {
+    try {
+      //^ checking if user exist
+      const user = await this.prisma.user.findUnique({
+        where: {
+          email: dto.email,
+        },
+      });
+
+      if (!user)
+        throw new ForbiddenException('User does not exist with given email!');
+
+      //^ generate reset token
+      const token = randomBytes(12).toString('hex');
+      const hashedToken = createHash('md5').update(token).digest('hex');
+
+      //^ updating user
+      await this.prisma.user.update({
+        where: {
+          email: dto.email,
+        },
+        data: {
+          resetToken: hashedToken,
+          tokenValidTime: Date.now() + 15 * 60 * 1000,
+        },
+      });
+
+      //^ sending email
+      await this.mailservice.sendUserConfirmation(dto.email, token);
+
+      return {
+        message: 'Email sent!',
+      };
     } catch (error) {
       throw error;
     }
