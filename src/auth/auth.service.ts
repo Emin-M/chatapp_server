@@ -4,7 +4,7 @@ import * as argon from 'argon2';
 import { ConfigService } from '@nestjs/config/dist';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ForgetPwDto, SignInDto, SignUpDto } from './dto';
+import { ForgetPwDto, ResetPwDto, SignInDto, SignUpDto } from './dto';
 import { Prisma } from '@prisma/client';
 import { createHash, randomBytes } from 'crypto';
 import { MailService } from 'src/mail/mail.service';
@@ -106,6 +106,46 @@ export class AuthService {
       return {
         message: 'Email sent!',
       };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  //! resetPassword
+  async resetPassword(token: string, dto: ResetPwDto) {
+    try {
+      //^ hashing token for comparing
+      const hashedToken = createHash('md5').update(token).digest('hex');
+
+      //^ checking token
+      const user = await this.prisma.user.findFirst({
+        where: {
+          resetToken: hashedToken,
+          tokenValidTime: {
+            gt: Date.now(),
+          },
+        },
+      });
+
+      if (!user) throw new ForbiddenException('Token expired or invalid!');
+
+      //^ hash new password
+      const hashedPassword = await argon.hash(dto.password);
+
+      //^ update user
+      const updatedUser = await this.prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          password: hashedPassword,
+          resetToken: null,
+          tokenValidTime: null,
+        },
+      });
+
+      //^ login user
+      return this.generateToken(updatedUser.id);
     } catch (error) {
       throw error;
     }
