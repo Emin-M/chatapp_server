@@ -1,73 +1,119 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Chat Application Server
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A robust and scalable chat application server built with NestJS, PostgreSQL, and Prisma ORM. This server provides real-time messaging capabilities with authentication, user management, and more.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Features
 
-## Description
+- 🔐 JWT-based authentication
+- 💬 Real-time messaging
+- 📧 Email notifications
+- 📊 PostgreSQL database with Prisma ORM
+- 📝 Swagger API documentation
+- 🧪 Comprehensive testing setup
+- 🐳 Docker support
+- ☸️ Kubernetes deployment ready
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Prerequisites
+
+- Node.js (v16 or higher)
+- npm or yarn
+- Docker and Docker Compose
+- PostgreSQL
+- Kubernetes (for production deployment)
 
 ## Installation
 
+1. Clone the repository:
 ```bash
-$ npm install
+git clone <repository-url>
+cd chatapp_server
 ```
 
-## Running the app
-
+2. Install dependencies:
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Test
+3. Set up environment variables:
+Create a `.env` file in the root directory with the following variables:
+```env
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/chatdb"
+JWT_SECRET="your-super-secret-key-here"
+JWT_EXPIRATION="1d"
+PORT=5000
+```
 
+4. Run database migrations:
 ```bash
-# unit tests
-$ npm run test
+npx prisma migrate dev
+```
+
+## Development
+
+Start the development server:
+```bash
+npm run start:dev
+```
+
+The server will be running at `http://localhost:5000`
+
+## API Documentation
+
+Once the server is running, you can access the Swagger API documentation at:
+```
+http://localhost:5000/api
+```
+
+## Testing
+
+Run the test suite:
+```bash
+# Unit tests
+npm run test
 
 # e2e tests
-$ npm run test:e2e
+npm run test:e2e
 
-# test coverage
-$ npm run test:cov
+# Test coverage
+npm run test:cov
 ```
 
-## Support
+## Docker Deployment
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+1. Build the Docker image:
+```bash
+docker build -t chatapp-server .
+```
 
-## Stay in touch
+2. Run with Docker Compose:
+```bash
+docker-compose up
+```
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Kubernetes Deployment
 
-## License
+The project includes Kubernetes manifests for deployment:
 
-Nest is [MIT licensed](LICENSE).
+- `deployment.yaml`: Main application deployment
+- `service.yaml`: Service definition
+- `postgres.yaml`: PostgreSQL deployment
+- `migration-job.yaml`: Database migration job
+
+To deploy to Kubernetes:
+```bash
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+kubectl apply -f postgres.yaml
+kubectl apply -f migration-job.yaml
+```
+
+## Project Structure
+
+```
+src/
+├── auth/           # Authentication module
+├── users/          # User management
+├── messages/       # Message handling
+├── prisma/         # Database schema and migrations
+└── main.ts         # Application entry point
+```

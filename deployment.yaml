@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatapp-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chatapp-server
+  template:
+    metadata:
+      labels:
+        app: chatapp-server
+    spec:
+      containers:
+      - name: chatapp-server
+        image: chatapp-server:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5000
+        env:
+        - name: NODE_ENV
+          value: "development"
+        - name: DATABASE_URL
+          value: "postgresql://postgres:postgres@postgres:5432/chatdb"
+        - name: JWT_SECRET
+          value: "your-super-secret-key-here"
+        - name: JWT_EXPIRATION
+          value: "1d"
+        - name: PORT
+          value: "5000"

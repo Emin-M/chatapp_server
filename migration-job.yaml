@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: prisma-migrate
+spec:
+  template:
+    spec:
+      containers:
+      - name: prisma-migrate
+        image: node:18-alpine
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          apk add --no-cache openssl
+          npm install -g prisma
+          npx prisma migrate deploy
+        env:
+        - name: DATABASE_URL
+          value: "postgresql://postgres:postgres@postgres:5432/chatdb"
+      restartPolicy: Never
+  backoffLimit: 4 
