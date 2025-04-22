@@ -55,7 +55,7 @@ Start the development server:
 npm run start:dev
 ```
 
-The server will be running at `http://localhost:5000`
+The server will be running at `http://localhost:5001`
 
 ## API Documentation
 
